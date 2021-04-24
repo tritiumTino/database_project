@@ -36,7 +36,7 @@ DROP TABLE IF EXISTS lease_contract;
 CREATE TABLE lease_contract (
 	company_id BIGINT UNSIGNED NOT NULL UNIQUE,
     num VARCHAR(255),
-    start_date DATETIME,
+    start_date DATE,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 	updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (company_id) REFERENCES companies(company_id) ON UPDATE CASCADE ON DELETE CASCADE,
@@ -47,7 +47,7 @@ CREATE TABLE lease_contract (
 DROP TABLE IF EXISTS workshops;
 CREATE TABLE workshops (
     workshop_id SERIAL,
-	number INT,
+	number INT UNIQUE,
     name VARCHAR(255),
     INDEX workshops_num (number)
 );
@@ -92,7 +92,7 @@ DROP TABLE IF EXISTS price_list;
 CREATE TABLE price_list (
 	category_id SERIAL,
     category_name VARCHAR(128), 
-    price DECIMAL(10,2)
+    price DECIMAL(7,2)
 );
 
 -- мусорные баки
@@ -109,7 +109,7 @@ CREATE TABLE trash_cans (
 );
 
 
--- мусорные баки, обсулживающие компании
+-- мусорные баки, обслуживающие компании
 DROP TABLE IF EXISTS trash_cans_companies;
 CREATE TABLE trash_cans_companies (
 	company_id BIGINT UNSIGNED NOT NULL,
@@ -144,11 +144,11 @@ CREATE TABLE contacts_companies (
 DROP TABLE IF EXISTS coming_out;
 CREATE TABLE coming_out (
 	coming_out_id SERIAL,
-    dump_time DATE,
+    dump_date DATE,
     trash_can_id BIGINT UNSIGNED NOT NULL,
-    total_amount INT UNSIGNED,
+    total_amount DECIMAL(10,2),
     FOREIGN KEY (trash_can_id) REFERENCES trash_cans(trash_can_id) ON UPDATE CASCADE ON DELETE CASCADE,
-    INDEX coming_out_time (dump_time)
+    INDEX coming_out_time (dump_date)
 );
 
 -- представление 1. Полная информация о компаниях
