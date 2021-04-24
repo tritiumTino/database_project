@@ -10,7 +10,7 @@ CREATE TABLE companies (
 	full_name VARCHAR(255),
 	short_name VARCHAR(128),
     INN BIGINT UNSIGNED UNIQUE,
-    is_subsidiary BIT(1) COMMENT 'являяется ли дочерним обществом',
+    is_subsidiary BIT(1) COMMENT 'является ли дочерним обществом',
 	created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 	updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	INDEX company_name (short_name),
@@ -140,7 +140,7 @@ CREATE TABLE contacts_companies (
 	FOREIGN KEY (contact_id) REFERENCES contacts(contact_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
--- поступление отходов на отвальное козяйство
+-- поступление отходов на отвальное хозяйство
 DROP TABLE IF EXISTS coming_out;
 CREATE TABLE coming_out (
 	coming_out_id SERIAL,
