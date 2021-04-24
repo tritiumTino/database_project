@@ -160,5 +160,3 @@ CREATE OR REPLACE VIEW companies_info AS
     INNER JOIN contacts_companies USING(company_id)
     INNER JOIN contacts cc USING(contact_id)
     ORDER BY id; 
-
--- стоимость общая - хранимая процедура?
