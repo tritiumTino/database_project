@@ -9,3 +9,13 @@ CREATE OR REPLACE VIEW companies_info AS
     INNER JOIN contacts_companies USING(company_id)
     INNER JOIN contacts cc USING(contact_id)
     ORDER BY id; 
+
+-- представление 2. Счета за вывоз отходов за последний месяц
+CREATE OR REPLACE VIEW companies_bill AS 
+	SELECT c.company_id as id, short_name, SUM(total_amount) as bill
+    FROM companies c INNER JOIN trash_cans_companies USING(company_id)
+    INNER JOIN trash_cans USING(trash_can_id)
+    INNER JOIN coming_out USING(trash_can_id)
+    WHERE MONTH(dump_date)=MONTH(NOW()) AND YEAR(dump_date)=YEAR(NOW())
+    GROUP BY c.company_id, short_name
+    ORDER BY id; 
