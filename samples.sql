@@ -22,7 +22,11 @@ WITH tab (name, total) AS (SELECT short_name, SUM(total_amount) FROM coming_out
 		WHERE month(dump_date) = month(NOW())
 			GROUP BY short_name) 
 SELECT name, round(total/@sum_total_amount, 2) as part, 
-	CASE WHEN round(total/@sum_total_amount, 2) >= 0.1 THEN 'main waste generator' WHEN round(total/@sum_total_amount, 2) >= 0.05 THEN 'important waste generator' ELSE 'side waste generator' END as status
+	CASE 
+		WHEN round(total/@sum_total_amount, 2) >= 0.1 THEN 'main waste generator' 
+        WHEN round(total/@sum_total_amount, 2) >= 0.05 THEN 'important waste generator' 
+        ELSE 'side waste generator' 
+	END as status
 	FROM tab 
 		ORDER BY part DESC, name;
 
@@ -44,4 +48,41 @@ SELECT `short_name`, `number`, `name` FROM workshops
 	INNER JOIN workshops_companies USING(workshop_id)
     INNER JOIN companies USING(company_id)
 		ORDER BY short_name, `number`;
-    
+  
+  
+-- насколько счет за этот месяц больше, чем за прошлый
+WITH t_prev (sn, stam_prev) as (
+	SELECT short_name, SUM(total_amount) FROM coming_out 
+		INNER JOIN trash_cans USING(trash_can_id) 
+		INNER JOIN trash_cans_companies USING(trash_can_id)
+		INNER JOIN companies USING(company_id)
+			WHERE month(dump_date) = month(date_sub(now(), INTERVAL 1 MONTH))
+				GROUP BY short_name),
+t_now (sn, stam) as (
+	SELECT short_name, SUM(total_amount) FROM coming_out 
+		INNER JOIN trash_cans USING(trash_can_id) 
+		INNER JOIN trash_cans_companies USING(trash_can_id)
+		INNER JOIN companies USING(company_id)
+			WHERE month(dump_date) = month(NOW())
+				GROUP BY short_name)
+SELECT sn as `name`, (IF(stam, stam, 0) - IF(stam_prev, stam_prev, 0)) as difference FROM t_prev LEFT JOIN t_now USING(sn)
+UNION
+SELECT sn as `name`, (IF(stam, stam, 0) - IF(stam_prev, stam_prev, 0)) as difference FROM t_prev RIGHT JOIN t_now USING(sn)
+	ORDER BY difference DESC;
+            
+            
+-- сколько отправлено на утилизацию за последний месяц
+SELECT category_name, SUM(`value`) as sum_value FROM coming_out 
+	INNER JOIN trash_cans USING(trash_can_id)
+    INNER JOIN price_list USING(category_id)
+		WHERE month(dump_date) = month(NOW()) AND category_id BETWEEN 1 AND 4
+			GROUP BY category_name
+            ORDER BY sum_value DESC;
+
+-- объемы отходов за последний месяц по цехам
+SELECT `number`, `name`, SUM(`value`) as total FROM coming_out 
+		INNER JOIN trash_cans USING(trash_can_id)
+        INNER JOIN workshops USING(workshop_id)
+			WHERE month(dump_date) = month(NOW())
+				GROUP BY `number`, `name`
+                ORDER BY total DESC;
