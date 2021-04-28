@@ -72,12 +72,13 @@ SELECT sn as `name`, (IF(stam, stam, 0) - IF(stam_prev, stam_prev, 0)) as differ
             
             
 -- сколько отправлено на утилизацию за последний месяц
-SELECT category_name, SUM(`value`) as sum_value FROM coming_out 
+SELECT ROW_NUMBER() OVER (ORDER BY SUM(`value`) DESC) AS num,
+	category_name, SUM(`value`) as sum_value FROM coming_out 
 	INNER JOIN trash_cans USING(trash_can_id)
     INNER JOIN price_list USING(category_id)
 		WHERE month(dump_date) = month(NOW()) AND category_id BETWEEN 1 AND 4
-			GROUP BY category_name
-            ORDER BY sum_value DESC;
+			GROUP BY category_name;
+
 
 -- объемы отходов за последний месяц по цехам
 SELECT `number`, `name`, SUM(`value`) as total FROM coming_out 
