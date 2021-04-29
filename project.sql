@@ -147,6 +147,7 @@ CREATE TABLE coming_out (
     dump_date DATE,
     trash_can_id BIGINT UNSIGNED NOT NULL,
     total_amount DECIMAL(10,2),
+    is_paid BIT(1),
     FOREIGN KEY (trash_can_id) REFERENCES trash_cans(trash_can_id) ON UPDATE CASCADE ON DELETE CASCADE,
     INDEX coming_out_time (dump_date)
 );
